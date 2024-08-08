@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addNewContact, updateContact } from "../../services";
+import { addNewContact, updateContactInfo } from "../../services";
 import "./style.css";
 
 const InputContactForm = (props) => {
@@ -8,18 +8,38 @@ const InputContactForm = (props) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
 
+  // Regex untuk memvalidasi format nomor telepon dan email
+  const regexPhoneNumber = /^[0-9]*$/;
+  const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  // Fungsi untuk memvalidasi input nomor telepon dan email
+  const validateInput = () => {
+    if (!regexPhoneNumber.test(phoneNumber)) {
+      alert("Nomor telepon hanya dapat berupa angka.");
+      return false;
+    }
+    if (!regexEmail.test(email)) {
+      alert("Format email tidak sesuai.");
+      return false;
+    }
+    return true;
+  };
+
   const { handleGetContacts, selectedContact } = props;
 
   const handleSubmit = async () => {
-    if (id > 0) {
-      // Ubah data kontak jika id lebih dari 0
-      await updateContact(id, {
-        full_name: fullName,
-        phone_number: phoneNumber,
-        email,
+    if (!validateInput()) return;
+
+    if (id) {
+      await updateContactInfo({
+        id,
+        data: {
+          full_name: fullName,
+          phone_number: phoneNumber,
+          email,
+        },
       });
     } else {
-      // Tambah kontak baru jika id adalah 0
       await addNewContact({
         full_name: fullName,
         phone_number: phoneNumber,
@@ -40,12 +60,13 @@ const InputContactForm = (props) => {
 
   const allowSubmit = !(!fullName || !phoneNumber || !email);
 
-  // Uncomment useEffect untuk mengisi form saat selectedContact berubah
   useEffect(() => {
-    setId(selectedContact?.id || 0);
-    setFullName(selectedContact?.fullName || "");
-    setPhoneNumber(selectedContact?.phoneNumber || "");
-    setEmail(selectedContact?.email || "");
+    setId(selectedContact?.id);
+    setFullName(selectedContact?.fullName ? selectedContact.fullName : "");
+    setPhoneNumber(
+      selectedContact?.phoneNumber ? selectedContact?.phoneNumber : ""
+    );
+    setEmail(selectedContact?.email ? selectedContact.email : "");
   }, [selectedContact]);
 
   return (
