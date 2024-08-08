@@ -1,5 +1,5 @@
-import "./style.css";
 import { deleteContact } from "../../services";
+import "./style.css";
 
 const ContactItem = (props) => {
   const {
@@ -16,6 +16,10 @@ const ContactItem = (props) => {
     handleGetContacts();
   };
 
+  const handlEditContact = () => {
+    handleSetSelected(id, full_name, phone_number, email);
+  };
+
   return (
     <div data-cy="item-card" className="contact-item__wrapper">
       <div className="contact-item__first-row">
@@ -26,7 +30,7 @@ const ContactItem = (props) => {
           <button
             data-cy="btn-edit"
             className="contact-item__button contact-item__edit-button"
-            onClick={() => handleSetSelected(id, full_name, phone_number, email)}
+            onClick={handlEditContact}
           >
             Edit
           </button>
